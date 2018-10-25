@@ -69,6 +69,17 @@ class ErrorHandler extends \yii\base\ErrorHandler
      * @since 2.0.7
      */
     public $displayVars = ['_GET', '_POST', '_FILES', '_COOKIE', '_SESSION'];
+    /**
+     * @var string trace line with placeholders to be be substituted.
+     * The placeholders are {file}, {line} and {text} and the string should be as follows.
+     *
+     * `File: {file} - Line: {line} - Text: {text}`
+     *
+     * @example <a href="ide://open?file={file}&line={line}">{html}</a>
+     * @see https://github.com/yiisoft/yii2-debug#open-files-in-ide
+     * @since 2.0.14
+     */
+    public $traceLine = '{html}';
 
 
     /**
@@ -221,7 +232,7 @@ class ErrorHandler extends \yii\base\ErrorHandler
      */
     protected function getTypeUrl($class, $method)
     {
-        if (strpos($class, 'yii\\') !== 0) {
+        if (strncmp($class, 'yii\\', 4) !== 0) {
             return null;
         }
 
@@ -412,7 +423,7 @@ class ErrorHandler extends \yii\base\ErrorHandler
     }
 
     /**
-     * Converts arguments array to its string representation
+     * Converts arguments array to its string representation.
      *
      * @param array $args arguments array to be converted
      * @return string string representation of the arguments array
@@ -466,7 +477,7 @@ class ErrorHandler extends \yii\base\ErrorHandler
     }
 
     /**
-     * Returns human-readable exception name
+     * Returns human-readable exception name.
      * @param \Exception $exception
      * @return string human-readable exception name or null if it cannot be determined
      */
@@ -475,6 +486,7 @@ class ErrorHandler extends \yii\base\ErrorHandler
         if ($exception instanceof \yii\base\Exception || $exception instanceof \yii\base\InvalidCallException || $exception instanceof \yii\base\InvalidParamException || $exception instanceof \yii\base\UnknownMethodException) {
             return $exception->getName();
         }
+
         return null;
     }
 
@@ -484,6 +496,6 @@ class ErrorHandler extends \yii\base\ErrorHandler
      */
     protected function shouldRenderSimpleHtml()
     {
-        return YII_ENV_TEST || isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest';
+        return YII_ENV_TEST || Yii::$app->request->getIsAjax();
     }
 }
